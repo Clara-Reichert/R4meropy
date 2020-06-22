@@ -1,8 +1,8 @@
 
 #choisir repertoire de travail
-setwd("C:/Users/clare/Desktop/R_GNSS/multi")
+setwd("C:/Users/clare/R4meropy")
 
-#importer le jeu de donn?es
+#importer le jeu de donnees
 pictdata <- read.delim("C:/Users/clare/Desktop/R_GNSS/multi/pictdata_29042000 (1).txt")
 
 #concatener date et heure
@@ -21,10 +21,10 @@ pictdata$Longitude=pictdata$AEX
 #choisir les bonnes colonnes
 pictdata=subset(pictdata,select=c(8,9,25))
 
-#enlever les lignes pour lesquelles il n'y a pas de coordonn?es (utile?)
+#enlever les lignes pour lesquelles il n'y a pas de coordonnees (utile?)
 pictdata=subset(pictdata,Latitude!="N99:99.9999")
 
-#Convertir les coordon?es du format N45:12.1234 ? 45.121234 
+#Convertir les coordonees du format N45:12.1234 ? 45.121234 
 #pas encore pris en compte N/S ?
 #pour la Latitude
 ########
@@ -78,7 +78,12 @@ M2$d_h=Files2
 ###
 
 ###############################
+M3=data.frame()
+Lh=character(length=0)
+Llat=list()
+Llong=list()
 i=1
+c=1
 l=length(pictdata$DateTime)
 for (i in 1:length(M)){
   if (is.na(M[i]==T)){
@@ -106,9 +111,11 @@ for (i in 1:length(M)){
             print(as.numeric(pictdata[k,1]))
             print(as.numeric(pictdata[k+1,2]))
             print(as.numeric(pictdata[k,2]))
-            #hyp: On est dans un carr? assez petit pour que la moyenne soit ? peu pr?s juste
-            M2[i,2]=mean(c(as.numeric(pictdata[k+1,1]),as.numeric(pictdata[k,1])))
-            M2[i,3]=mean(c(as.numeric(pictdata[k+1,2]),as.numeric(pictdata[k,2])))
+            #hyp: On est dans un carré assez petit pour que la moyenne soit ? peu pr?s juste???
+            Llat[c]=mean(c(as.numeric(pictdata[k+1,1]),as.numeric(pictdata[k,1])))
+            Llong[c]=mean(c(as.numeric(pictdata[k+1,2]),as.numeric(pictdata[k,2])))
+            Lh[c]=heure
+            c=c+1
             break
           }
         }
