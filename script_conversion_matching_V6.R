@@ -78,11 +78,9 @@ M2$d_h=Files2
 ###
 
 ###############################
-M3=data.frame()
-Lh=character(length=0)
-Llat=list()
-Llong=list()
+
 i=1
+L=character(length=0)
 c=1
 l=length(pictdata$DateTime)
 for (i in 1:length(M)){
@@ -112,10 +110,10 @@ for (i in 1:length(M)){
             print(as.numeric(pictdata[k+1,2]))
             print(as.numeric(pictdata[k,2]))
             #hyp: On est dans un carré assez petit pour que la moyenne soit ? peu pr?s juste???
-            Llat[c]=mean(c(as.numeric(pictdata[k+1,1]),as.numeric(pictdata[k,1])))
-            Llong[c]=mean(c(as.numeric(pictdata[k+1,2]),as.numeric(pictdata[k,2])))
-            Lh[c]=heure
-            c=c+1
+            print(mean(c(as.numeric(pictdata[k+1,1]),as.numeric(pictdata[k,1]))))
+            M2[i,2]=mean(c(as.numeric(pictdata[k+1,1]),as.numeric(pictdata[k,1])))
+            M2[i,3]=mean(c(as.numeric(pictdata[k+1,2]),as.numeric(pictdata[k,2])))
+            L[c]=i
             break
           }
         }
@@ -127,6 +125,9 @@ for (i in 1:length(M)){
 M2$nom_images=Files
 #enlever les colonnes inutiles
 M2=subset(M2,select=c(2,3,5))
+M3=M2[L,]
 
 #enregistrer le fichier csv créé
 write.csv2(M2, file = "Coord_GNSS_images.csv", row.names = FALSE)
+#enregistrer le fichier csv créé
+write.csv2(M3, file = "Coord_GNSS_calculees_images.csv", row.names = FALSE)
