@@ -1,4 +1,4 @@
-
+#git push -u origin master
 #choisir repertoire de travail
 setwd("C:/Users/clare/R4meropy")
 
@@ -31,12 +31,17 @@ pictdata=subset(pictdata,Latitude!="N99:99.9999")
 L=character(length=0)
 for ( i in 1:length(pictdata$Latitude)){
   A=as.character(pictdata[i,1])
-  B1=substr(A,2,3)
-  B2=substr(A,5,6)
-  B3=substr(A,8,11)
-  B4=paste(B2,B3, sep="")
-  C=paste(B1,B4,sep=".")
-  L[i]=as.numeric(C)
+  B1=as.numeric(substr(A,2,3))
+  B2=as.numeric(substr(A,5,6))
+  B3=as.numeric(substr(A,8,9))
+  B4=as.numeric(substr(A,10,11))
+  B3=as.numeric(paste(B3,B4,sep="."))
+  B=B1+B2/60+B3/3600
+  if(substr(A,1,1)=="S"){
+    B=-B
+  }
+
+  L[i]=as.double(round(B,6))
 }
 pictdata$Latitude=L
 #######
@@ -44,15 +49,17 @@ pictdata$Latitude=L
 L=character(length=0)
 for ( i in 1:length(pictdata$Longitude)){
   A=as.character(pictdata[i,2])
-  B1=substr(A,2,4)
-  B2=substr(A,6,7)
-  B3=substr(A,9,12)
-  B4=paste(B2,B3, sep="")
+  B1=as.numeric(substr(A,2,4))
+  B2=as.numeric(substr(A,6,7))
+  B3=as.numeric(substr(A,9,10))
+  B4=as.numeric(substr(A,11,12))
+  B3=as.numeric(paste(B3,B4,sep="."))
+  B=B1+B2/60+B3/3600
   if(substr(A,1,1)=="O"){
-    B1=paste("-",B1,sep="")
+    B=-B
   }
-  C=paste(B1,B4,sep=".")
-  L[i]=as.double(C)
+
+  L[i]=as.double(round(B,6))
 }
 pictdata$Longitude=L
 ##########
