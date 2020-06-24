@@ -3,7 +3,7 @@
 setwd("C:/Users/clare/R4meropy")
 
 #importer le jeu de donnees
-pictdata <- read.delim("C:/Users/clare/Desktop/R_GNSS/multi/pictdata_29042000 (1).txt")
+pictdata <- read.delim("C:/Users/clare/R4meropy/pictdata_03062000.txt")
 
 #concatener date et heure
 pictdata$DateTime=paste(pictdata$Date,pictdata$X)
@@ -66,7 +66,7 @@ pictdata$Longitude=L
 
 
 #récupérer les noms des photos
-Files=list.files(path="C:\\Users\\clare\\Desktop\\Données_stage\\Nettoyage\\Culture")
+Files=list.files(path="C:\\Users\\clare\\Desktop\\Données_stage\\03_06\\Nettoyage0306\\Culture")
 
 #garder uniquement la date et l'heure et mettre au bon format
 Files2=as.POSIXlt(Files, format="chassis_%Y-%m-%d_%H.%M.%S.jpg")
@@ -89,9 +89,11 @@ M2$d_h=Files2
 i=1
 L=character(length=0)
 c=1
+K=0
 l=length(pictdata$DateTime)
 for (i in 1:length(M)){
   if (is.na(M[i]==T)){
+    K=K+1
     heure=M2[i,4]
     print (heure)
     j=1
@@ -121,6 +123,7 @@ for (i in 1:length(M)){
             M2[i,2]=mean(c(as.numeric(pictdata[k+1,1]),as.numeric(pictdata[k,1])))
             M2[i,3]=mean(c(as.numeric(pictdata[k+1,2]),as.numeric(pictdata[k,2])))
             L[c]=i
+            c=c+1
             break
           }
         }
@@ -133,8 +136,9 @@ M2$nom_images=Files
 #enlever les colonnes inutiles
 M2=subset(M2,select=c(2,3,5))
 M3=M2[L,]
+M4=M2[-as.numeric(L) ,]
 
 #enregistrer le fichier csv créé
 write.csv2(M2, file = "Coord_GNSS_images.csv", row.names = FALSE)
 #enregistrer le fichier csv créé
-write.csv2(M3, file = "Coord_GNSS_calculees_images.csv", row.names = FALSE)
+write.csv2(M4, file = "Coord_GNSS_calculees_images.csv", row.names = FALSE)
