@@ -1,9 +1,7 @@
-#git push -u origin master
-#choisir repertoire de travail
-setwd("C:/Users/clare/R4meropy")
+####################### extraire longitude, latitude et date_heure (pour les données GNSS u=issues du capteur multispectral)
 
 #importer le jeu de donnees
-pictdata <- read.delim("C:/Users/clare/R4meropy/pictdata_03062000.txt")
+pictdata <- read.delim("C:\\Users\\clare\\Desktop\\R_GNSS\\multi\\pictdata_29042000.txt")
 
 #concatener date et heure
 pictdata$DateTime=paste(pictdata$Date,pictdata$X)
@@ -32,15 +30,14 @@ L=character(length=0)
 for ( i in 1:length(pictdata$Latitude)){
   A=as.character(pictdata[i,1])
   B1=as.numeric(substr(A,2,3))
-  B2=as.numeric(substr(A,5,6))
-  B3=as.numeric(substr(A,8,9))
-  B4=as.numeric(substr(A,10,11))
-  B3=as.numeric(paste(B3,B4,sep="."))
-  B=B1+B2/60+B3/3600
+  B2=substr(A,5,6)
+  B3=substr(A,8,11)
+  B2=as.numeric(paste(B2,B3,sep="."))
+  B=B1+B2/60
   if(substr(A,1,1)=="S"){
     B=-B
   }
-
+  
   L[i]=as.double(round(B,6))
 }
 pictdata$Latitude=L
@@ -50,23 +47,22 @@ L=character(length=0)
 for ( i in 1:length(pictdata$Longitude)){
   A=as.character(pictdata[i,2])
   B1=as.numeric(substr(A,2,4))
-  B2=as.numeric(substr(A,6,7))
-  B3=as.numeric(substr(A,9,10))
-  B4=as.numeric(substr(A,11,12))
-  B3=as.numeric(paste(B3,B4,sep="."))
-  B=B1+B2/60+B3/3600
+  B2=substr(A,6,7)
+  B3=substr(A,9,12)
+  B2=as.numeric(paste(B2,B3,sep="."))
+  B=B1+B2/60
   if(substr(A,1,1)=="O"){
     B=-B
   }
-
+  
   L[i]=as.double(round(B,6))
 }
 pictdata$Longitude=L
-##########
+#########################
 
 
 #récupérer les noms des photos
-Files=list.files(path="C:\\Users\\clare\\Desktop\\Données_stage\\03_06\\Nettoyage0306\\Culture")
+Files=list.files(path="C:\\Users\\clare\\Desktop\\Données_stage\\Nettoyage\\Culture")
 
 #garder uniquement la date et l'heure et mettre au bon format
 Files2=as.POSIXlt(Files, format="chassis_%Y-%m-%d_%H.%M.%S.jpg")
@@ -139,6 +135,6 @@ M3=M2[L,]
 M4=M2[-as.numeric(L) ,]
 
 #enregistrer le fichier csv créé
-write.csv2(M2, file = "Coord_GNSS_images.csv", row.names = FALSE)
+write.csv2(M4, file = "Coord_GNSS_images.csv", row.names = FALSE)
 #enregistrer le fichier csv créé
-write.csv2(M4, file = "Coord_GNSS_calculees_images.csv", row.names = FALSE)
+write.csv2(M3, file = "Coord_GNSS_calculees_images.csv", row.names = FALSE)
