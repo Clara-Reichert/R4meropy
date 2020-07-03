@@ -1,74 +1,24 @@
-####################### extraire longitude, latitude et date_heure (pour les données GNSS u=issues du capteur multispectral)
+#############################################
+#### script principal coordonnées-images ####
+#############################################
 
-#importer le jeu de donnees
-pictdata <- read.delim("C:\\Users\\clare\\Desktop\\R_GNSS\\multi\\pictdata_29042000.txt")
+#### extraction  des coordonnées, date et heure selon la source GNSS ####
 
-#concatener date et heure
-pictdata$DateTime=paste(pictdata$Date,pictdata$X)
-
-#passer dans le format date heure
-pictdata$DateTime=as.POSIXct(pictdata$DateTime , format = "%d:%m:%Y %H:%M:%S")
-
-#mettre dans le bon fuseau horaire
-pictdata$DateTime=pictdata$DateTime+3600
-
-#renommer les colonnes
-pictdata$Latitude=pictdata$GPS
-pictdata$Longitude=pictdata$AEX
-
-#choisir les bonnes colonnes
-pictdata=subset(pictdata,select=c(8,9,25))
-
-#enlever les lignes pour lesquelles il n'y a pas de coordonnees (utile?)
-pictdata=subset(pictdata,Latitude!="N99:99.9999")
-
-#Convertir les coordonees du format N45:12.1234 ? 45.121234 
-#pas encore pris en compte N/S ?
-#pour la Latitude
-########
-L=character(length=0)
-for ( i in 1:length(pictdata$Latitude)){
-  A=as.character(pictdata[i,1])
-  B1=as.numeric(substr(A,2,3))
-  B2=substr(A,5,6)
-  B3=substr(A,8,11)
-  B2=as.numeric(paste(B2,B3,sep="."))
-  B=B1+B2/60
-  if(substr(A,1,1)=="S"){
-    B=-B
-  }
-  
-  L[i]=as.double(round(B,6))
-}
-pictdata$Latitude=L
-#######
-#pour la longitude
-L=character(length=0)
-for ( i in 1:length(pictdata$Longitude)){
-  A=as.character(pictdata[i,2])
-  B1=as.numeric(substr(A,2,4))
-  B2=substr(A,6,7)
-  B3=substr(A,9,12)
-  B2=as.numeric(paste(B2,B3,sep="."))
-  B=B1+B2/60
-  if(substr(A,1,1)=="O"){
-    B=-B
-  }
-  
-  L[i]=as.double(round(B,6))
-}
-pictdata$Longitude=L
-#########################
+#copier-coller ou run le script_omega ou script_multi en fonction du GPS
 
 
+#### récupération des noms des photos ####
 #récupérer les noms des photos
-Files=list.files(path="C:\\Users\\clare\\Desktop\\Données_stage\\Nettoyage\\Culture")
+#modifier le chamin d'acces pour que ce soit le chemin du dossier contenant les photos à matcher
+Files=list.files(path="C:\\Users\\clare\\Desktop\\Données_stage\\03_06\\Nettoyage0306\\Culture")
 
 #garder uniquement la date et l'heure et mettre au bon format
 Files2=as.POSIXlt(Files, format="chassis_%Y-%m-%d_%H.%M.%S.jpg")
 
-#Passer la date et heure au format chaine de caractères (arriver pas à matcher autrement)
+#Passer la date et heure au format chaine de caractères (arrive pas à matcher autrement)
 pictdata$DateTime2=as.character.Date(pictdata$DateTime)
+
+#### Recherche des correspondances date_heure entre les noms de photos et les coordonnées ####
 
 #Chercher les lignes en commun
 M=match(Files2,pictdata$DateTime2)
@@ -80,46 +30,38 @@ M2$Longitude=pictdata[M,2]
 M2$d_h=Files2
 ###
 
-###############################
+#### Calcul des coordonnées pour lesquelles il n'y a pas de correspondance exacte ####
 
-i=1
-L=character(length=0)
-c=1
-K=0
-l=length(pictdata$DateTime)
-for (i in 1:length(M)){
-  if (is.na(M[i]==T)){
+# moyennes des coordonnées correspondant à l'heure +/- 1 seconde
+L=character(length=0)   # liste contenant les indices (positions) des valeurs calculées
+c=1                     # compteur du nombre de valeurs calculées
+K=                      # compteur du nombre de photos sans coordonnées
+l=length(pictdata$DateTime) #longueur du data frame
+ 
+for (i in 1:length(M)){         # parcours toutes les correspondances du matching
+  if (is.na(M[i]==T)){          # s'il y a un NA on fait la suite
     K=K+1
     heure=M2[i,4]
     print (heure)
     j=1
-    T1=as.numeric(pictdata[1,3])
-    T2=as.numeric(pictdata[l,3])              
-    for (j in T1:T2){         #j est l'heure en secondes depuis le 1970-01-01
+    T1=as.numeric(pictdata[1,3])  #première heure du dataframe
+    T2=as.numeric(pictdata[l,3])  #dernière heure du dataframe            
+    for (j in T1:T2){         
+      #j est l'heure en secondes depuis le 1970-01-01
       H1=as.numeric(heure+1)
       H2=as.numeric(heure-1)
-      if (H1==j+1 && H2==j-1 ){
+      if (H1==j+1 && H2==j-1 ){   #on verifie bien qu'il y a des lignes qui encadrent sont à une seconde près
         print("YES")
-        ## l'horaire manquante est bien entour? ? une seconde pr?s de coordonn?es, on peut faire la moyenne
         k=1
-        for (k in 1:l) {
+        for (k in 1:l) {          # on parcours le dataframe de coordonnées pour trouver les lat/lon correspondant à la bonne heur
           
           if(as.numeric(pictdata[k+1,3])==as.numeric(heure+1) && as.numeric(pictdata[k,3])==as.numeric(heure-1)){ 
-            print("Maybe")
-            print(k)
-            print(pictdata[k+1,3])
-            print(pictdata[k,3])
-            print(i)
-            print(as.numeric(pictdata[k+1,1]))
-            print(as.numeric(pictdata[k,1]))
-            print(as.numeric(pictdata[k+1,2]))
-            print(as.numeric(pictdata[k,2]))
-            #hyp: On est dans un carré assez petit pour que la moyenne soit ? peu pr?s juste???
-            print(mean(c(as.numeric(pictdata[k+1,1]),as.numeric(pictdata[k,1]))))
-            M2[i,2]=mean(c(as.numeric(pictdata[k+1,1]),as.numeric(pictdata[k,1])))
-            M2[i,3]=mean(c(as.numeric(pictdata[k+1,2]),as.numeric(pictdata[k,2])))
-            L[c]=i
-            c=c+1
+            print("Calcul")
+            M2[i,2]=mean(c(as.numeric(pictdata[k+1,1]),as.numeric(pictdata[k,1])))    #calcule la moyenne des latitudes
+            M2[i,3]=mean(c(as.numeric(pictdata[k+1,2]),as.numeric(pictdata[k,2])))    #calcule la moyenne des longitudes
+            L[c]=i        # ajoute l'indice à la liste
+            c=c+1  
+            #sort de la boucle car on a troué les bonnes valeusrs
             break
           }
         }
@@ -127,14 +69,17 @@ for (i in 1:length(M)){
     }
   }
 }
-###############################
+#### créer des dataframes avec les différents données ####
+#ajoute le nom de la photo
 M2$nom_images=Files
-#enlever les colonnes inutiles
+#arder que les colonnes utiles
 M2=subset(M2,select=c(2,3,5))
+#coordonnées calculées
 M3=M2[L,]
+#coordonnées directes
 M4=M2[-as.numeric(L) ,]
 
-#enregistrer le fichier csv créé
+#### enregistrer les fichiers csv créés ####
 write.csv2(M4, file = "Coord_GNSS_images.csv", row.names = FALSE)
-#enregistrer le fichier csv créé
 write.csv2(M3, file = "Coord_GNSS_calculees_images.csv", row.names = FALSE)
+
