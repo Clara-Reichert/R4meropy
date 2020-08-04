@@ -4,7 +4,7 @@
 
 #### extraction  des coordonnées, date et heure selon la source GNSS ####
 
-#copier-coller ou run le script_omega ou script_multi en fonction du GPS
+#copier-coller ou run le script_omega ou script_multi en fonction du GPS utilisé pour obtenir les données
 
 
 #### récupération des noms des photos ####
@@ -32,6 +32,7 @@ M2$d_h=Files2
 
 #### Calcul des coordonnées pour lesquelles il n'y a pas de correspondance exacte ####
 
+#cette partie prends plus de temps
 # moyennes des coordonnées correspondant à l'heure +/- 1 seconde
 L=character(length=0)   # liste contenant les indices (positions) des valeurs calculées
 c=1                     # compteur du nombre de valeurs calculées

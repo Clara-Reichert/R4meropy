@@ -3,6 +3,7 @@
 #############################################
 #lire le csv comportant tous les points avec coordonnées calculées ou non
 D=read.csv("C:/Users/clare/R4meropy/toutcalculee.csv", sep=";")
+
 #créer nvlle colonne
 D$adventices=""
 

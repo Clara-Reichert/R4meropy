@@ -5,8 +5,11 @@
 
 ## lecture du jeu de données ###
 #importer le jeu de donnees
-pictdata <- read.delim("C:\\Users\\clare\\Desktop\\R_GNSS\\multi\\pictdata_29042000.txt")
+pictdata1 <- read.delim("C:\\Users\\clare\\Desktop\\mais\\GPS multispectral\\pictdata_22042000.txt")
+pictdata2 <- read.delim("C:\\Users\\clare\\Desktop\\mais\\GPS multispectral\\pictdata_22042001.txt")
+pictdata3 <- read.delim("C:\\Users\\clare\\Desktop\\mais\\GPS multispectral\\pictdata_22042002.txt")
 
+pictdata=rbind(pictdata1,pictdata2,pictdata3)
 #concatener date et heure
 pictdata$DateTime=paste(pictdata$Date,pictdata$X)
 
@@ -14,7 +17,7 @@ pictdata$DateTime=paste(pictdata$Date,pictdata$X)
 pictdata$DateTime=as.POSIXct(pictdata$DateTime , format = "%d:%m:%Y %H:%M:%S")
 
 #mettre dans le bon fuseau horaire
-pictdata$DateTime=pictdata$DateTime+3600
+pictdata$DateTime=pictdata$DateTime+2*3600
 
 #renommer les colonnes
 pictdata$Latitude=pictdata$GPS

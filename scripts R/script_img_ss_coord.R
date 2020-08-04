@@ -4,7 +4,7 @@
 # il faut avoir run le script principal avant celui-ci
 # il permet de calculer les coordonnées pour une photo si les coordonénes qui l'encadrent sont éloigéns de plus d'un seconde
 
-#git push -u origin master      (commande git)
+#git push -u origin master      (commande git utile à garer sous le coude)
 
 #attention, bug quand il y a pas du tout de coordonnées autour, il faut faire commencer à la première coordonnées existante
 
